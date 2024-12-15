@@ -6,13 +6,27 @@ from garth.exc import GarthException
 from datetime import datetime, timedelta
 
 def restore_or_login_session():
-    try:
-        garth.resume(garmin_constants.SESSION_FILE)
-        debug_print(f"Session restored for: {garth.client.username}")
-    except GarthException:
-        debug_print("No saved session or invalid session. Logging in...")
+    session_file = garmin_constants.SESSION_FILE
+    session_dir = os.path.dirname(session_file)
+
+    if not os.path.isdir(session_dir):
+        debug_print(f"Session directory does not exist. Creating: {session_dir}")
+        os.makedirs(session_dir, exist_ok=True)
+
+    if not os.path.isfile(session_file):
+        debug_print(f"Session file not found: {session_file}. Logging in...")
         garth.login(config.garmin_email, config.garmin_password)
-        garth.save(garmin_constants.SESSION_FILE)
+        garth.save(session_file)
+        debug_print(f"Session saved to: {session_file}")
+    else:
+        try:
+            garth.resume(session_file)
+            debug_print(f"Session restored for: {garth.client.username}")
+        except GarthException:
+            debug_print("Invalid session file. Logging in...")
+            garth.login(config.garmin_email, config.garmin_password)
+            garth.save(session_file)
+            debug_print(f"Session saved to: {session_file}")
 
 def fetch_weight_data(start_date, end_date):
     try:
