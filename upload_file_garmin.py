@@ -6,27 +6,34 @@ from garth.exc import GarthException
 from datetime import datetime, timedelta
 
 def restore_or_login_session():
-    session_file = garmin_constants.SESSION_FILE
-    session_dir = os.path.dirname(session_file)
+    session_dir = garmin_constants.SESSION_FILE
 
     if not os.path.isdir(session_dir):
         debug_print(f"Session directory does not exist. Creating: {session_dir}")
         os.makedirs(session_dir, exist_ok=True)
 
-    if not os.path.isfile(session_file):
-        debug_print(f"Session file not found: {session_file}. Logging in...")
-        garth.login(config.garmin_email, config.garmin_password)
-        garth.save(session_file)
-        debug_print(f"Session saved to: {session_file}")
+    oauth1_file = os.path.join(session_dir, "oauth1_token.json")
+    oauth2_file = os.path.join(session_dir, "oauth2_token.json")
+    if not os.path.isfile(oauth1_file) or not os.path.isfile(oauth2_file):
+        debug_print(f"Session files not found in: {session_dir}. Logging in...")
+        login_and_save_tokens(session_dir)
     else:
         try:
-            garth.resume(session_file)
-            debug_print(f"Session restored for: {garth.client.username}")
-        except GarthException:
-            debug_print("Invalid session file. Logging in...")
-            garth.login(config.garmin_email, config.garmin_password)
-            garth.save(session_file)
-            debug_print(f"Session saved to: {session_file}")
+            debug_print(f"Attempting to restore session from: {session_dir}")
+            garth.resume(session_dir)
+            debug_print(f"Session successfully restored for: {garth.client.username}")
+        except GarthException as e:
+            debug_print(f"Failed to restore session. Error: {e}")
+            debug_print("Logging in and creating new session files...")
+            login_and_save_tokens(session_dir)
+
+def login_and_save_tokens(session_dir):
+    try:
+        garth.login(config.garmin_email, config.garmin_password)
+        garth.save(session_dir)
+        debug_print(f"Session tokens saved successfully to: {session_dir}")
+    except Exception as e:
+        debug_print(f"Failed to login and save session tokens. Error: {e}")
 
 def fetch_weight_data(start_date, end_date):
     try:
