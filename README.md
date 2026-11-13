@@ -1,6 +1,6 @@
 # Fit2Garmin
 
-**Fit2Garmin** is a Python script designed to automatically upload `.fit` files to the [*Garmin Connect*](https://connect.garmin.com/) platform. The script streamlines the process by fetching `.fit` files from a specified folder, checking for new files, and uploading them to *Garmin Connect*. It utilizes the `garth` library for handling the authentication and upload process. Additionally, the script ensures robust session management, either restoring an existing session or logging in and saving the session if necessary. 
+**Fit2Garmin** is a Python script designed to automatically upload `.fit` files to the [*Garmin Connect*](https://connect.garmin.com/) platform. The script streamlines the process by fetching `.fit` files from a specified folder, checking for new files, and uploading them to *Garmin Connect*. It utilizes the [`garminconnect`](https://pypi.org/project/garminconnect/) library for handling authentication, session persistence, and file uploads. Additionally, the script ensures robust session management, either restoring an existing session or logging in and saving the session tokens if necessary. 
 
 The goal is to make the upload process seamless and efficient, ensuring that fitness data is synchronized with *Garmin Connect* with minimal user intervention.
 
@@ -34,10 +34,10 @@ Follow these steps to set up and run the script:
 
 ### 1. Install Dependencies
 
-Before running the script, ensure you have Python installed on your system. Then, install the required libraries with the following command:
+Before running the script, ensure you have Python 3.12 or newer installed on your system. Then, install the required libraries with the following command:
 
 ```bash
-pip install garth
+pip install -r requirements.txt
 ```
 ### 2. Configure `config.py`
 
